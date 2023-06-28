@@ -10,9 +10,10 @@ contract FundMeTest is Test {
     FundMe fundMe;
 
     function setUp() external {
-        // ? us -> fundMeTest -> FundMe
-        // ! us == msg.sender
-        // * fundMeTest == address(this) == fundMe.i_owner()
+        //1 us -> fundMeTest -> FundMe
+        //2 us == msg.sender
+        //3 fundMeTest == address(this) == fundMe.i_owner()
+        // FundMe fundMe = new FundMe();
         DeployFundMe deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
     }
@@ -22,8 +23,10 @@ contract FundMeTest is Test {
     }
 
     function testOwnerIsMsgSender() public {
+        /*  console.log("FundMe Owner: ");
         console.log(fundMe.i_owner());
-        console.log(msg.sender);
+        console.log("\nmsg.sender: ");
+        console.log(msg.sender); */
         // assertEq(fundMe.i_owner(), msg.sender);
         // ? Why address(this) instead of msg.sender ?
         // ? Look comments in the setUp function
@@ -44,5 +47,5 @@ contract FundMeTest is Test {
     }
 }
 
-//3 Modular deployments
+//2 Modular deployments
 //4 Modular testing
