@@ -53,8 +53,8 @@ contract HelperConfig is Script {
     function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
         // 1. Deploy the mocks
         // 2. Return the mock address
-        //5 address(0) -> the first address/default value -> SINGLETON
-        //5 Check to see if we set an active network config
+        //5 address(0) -> the first address/default value
+        //5 Check to see if we already set an active network config -> SINGLETON
         if (activeNetworkConfig.priceFeed != address(0)) {
             return activeNetworkConfig;
         }

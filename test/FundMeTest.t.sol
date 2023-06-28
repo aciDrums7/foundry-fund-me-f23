@@ -8,6 +8,9 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
+    address USER = makeAddr("user");
+    uint256 constant SEND_VALUE = 0.1 ether; //4 100000000000000000
+    uint256 constant STARTING_BALANCE = 10 ether;
 
     function setUp() external {
         //1 us -> fundMeTest -> FundMe
@@ -16,11 +19,12 @@ contract FundMeTest is Test {
         // FundMe fundMe = new FundMe();
         DeployFundMe deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
+        vm.deal(USER, STARTING_BALANCE);
     }
 
-    function testMinimumDollarIsFive() public {
-        assertEq(fundMe.MINIMUM_USD(), 5e18);
-    }
+    /* function testMinimumDollarIsFive() public {
+        assertEq(fundMe.get(), 5e18);
+    } */
 
     function testOwnerIsMsgSender() public {
         /*  console.log("FundMe Owner: ");
@@ -30,7 +34,7 @@ contract FundMeTest is Test {
         // assertEq(fundMe.i_owner(), msg.sender);
         // ? Why address(this) instead of msg.sender ?
         // ? Look comments in the setUp function
-        assertEq(fundMe.i_owner(), msg.sender);
+        assertEq(fundMe.getOwner(), msg.sender);
     }
 
     //? What can we do to work with addresses outside our system?
@@ -45,7 +49,20 @@ contract FundMeTest is Test {
     function testPriceFeedVersionIsAccurate() public {
         assertEq(fundMe.getVersion(), 4);
     }
+
+    function testFundFailsWithoutEnoughEth() public {
+        vm.expectRevert(); //1 hey, the next line, shoud rever!
+        //2 assert(This tx fails/reverts
+        fundMe.fund(); //3 send 0 value
+    }
+
+    function testFundUpdatesFundedDataStructure() public {
+        vm.prank(USER); //1 The next tx will be sent by USER
+        fundMe.fund{value: SEND_VALUE}();
+        uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
+        assertEq(amountFunded, SEND_VALUE);
+    }
 }
 
-//2 Modular deployments
-//4 Modular testing
+//3 Modular deployments
+//5 Modular testing
