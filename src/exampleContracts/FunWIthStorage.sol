@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 contract FunWithStorage {
-    uint256 favoriteNumber; // Stored at slot 0
-    bool someBool; // Stored at slot 1
+    uint256 favoriteNumber; //1 Stored at slot 0
+    bool someBool; //2 Stored at slot 1
     uint256[] myArray; /* Array Length Stored at slot 2,
         but the objects will be the keccak256(2), since 2 is the storage slot of the array */
     mapping(uint256 => bool) myMap; /* An empty slot is held at slot 3
@@ -16,16 +16,16 @@ contract FunWithStorage {
     uint256 immutable i_not_in_storage;
 
     constructor() {
-        favoriteNumber = 25; // See stored spot above // SSTORE
-        someBool = true; // See stored spot above // SSTORE
-        myArray.push(222); // SSTORE
-        myMap[0] = true; // SSTORE
+        favoriteNumber = 25; //1 See stored spot above // SSTORE
+        someBool = true; //2 See stored spot above // SSTORE
+        myArray.push(222); //3 SSTORE
+        myMap[0] = true; //4 SSTORE
         i_not_in_storage = 123;
     }
 
     function doStuff() public {
-        uint256 newVar = favoriteNumber + 1; // SLOAD
-        bool otherVar = someBool; // SLOAD
-            // ^^ memory variables
+        uint256 newVar = favoriteNumber + 1; //4 SLOAD
+        bool otherVar = someBool; //5 SLOAD
+            //6 ^^ memory variables
     }
 }

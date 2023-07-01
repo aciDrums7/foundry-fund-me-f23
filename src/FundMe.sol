@@ -5,6 +5,7 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/Ag
 import {PriceConverter} from "./PriceConverter.sol";
 
 error FundMe__NotOwner();
+error FundMe__NotEnoughEth();
 
 contract FundMe {
     using PriceConverter for uint256;
@@ -26,9 +27,9 @@ contract FundMe {
     }
 
     function fund() public payable {
-        require(msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD, "You need to spend more ETH!");
-        s_addressToAmountFunded[msg.sender] += msg.value;
+        if (msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD) revert FundMe__NotEnoughEth();
         s_funders.push(msg.sender);
+        s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
