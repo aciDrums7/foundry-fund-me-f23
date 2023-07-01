@@ -27,7 +27,7 @@ contract FundMe {
     }
 
     function fund() public payable {
-        if (msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD) revert FundMe__NotEnoughEth();
+        if (msg.value.getConversionRate(s_priceFeed) <= MINIMUM_USD) revert FundMe__NotEnoughEth();
         s_funders.push(msg.sender);
         s_addressToAmountFunded[msg.sender] += msg.value;
     }
