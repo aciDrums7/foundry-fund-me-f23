@@ -100,15 +100,14 @@ contract FundMeTest is Test {
         uint160 numberOfFunders = 7;
         //2 sometimes address(0) reverts in tests, so better start from address(1)
         uint160 startingFunderIndex = 1;
-        for(uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
             //1 vm.prank new address
             //2 vm.deal new address
             //3 hoax -> prank + deal
             hoax(address(i), SEND_VALUE);
-            fundMe.fund{value:SEND_VALUE}();
+            fundMe.fund{value: SEND_VALUE}();
             //4 fund the fundMe
         }
-
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
         uint256 startingFundMeBalance = address(fundMe).balance;
 
@@ -117,6 +116,39 @@ contract FundMeTest is Test {
         vm.txGasPrice(GAS_PRICE);
         vm.startPrank(fundMe.getOwner());
         fundMe.withdraw(); //7 should have spent gas?
+
+        uint256 gasEnd = gasleft(); //3 800
+        uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice; //3 200
+        console.log(gasUsed);
+        vm.stopPrank();
+
+        // 3. Assert
+        uint256 endingOwnerBalance = fundMe.getOwner().balance;
+        uint256 endingFundMeBalance = address(fundMe).balance;
+        assertEq(endingFundMeBalance, 0);
+        assertEq(endingOwnerBalance, startingOwnerBalance + startingFundMeBalance);
+    }
+
+    function testWithdrawFromMultipleFundersCheaper() public {
+        // 1. Arrange
+        uint160 numberOfFunders = 7;
+        uint160 startingFunderIndex = 1;
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+            //1 vm.prank new address
+            //2 vm.deal new address
+            //3 hoax -> prank + deal
+            hoax(address(i), SEND_VALUE);
+            fundMe.fund{value: SEND_VALUE}();
+            //4 fund the fundMe
+        }
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        // 2. Act
+        uint256 gasStart = gasleft(); //3 1000
+        vm.txGasPrice(GAS_PRICE);
+        vm.startPrank(fundMe.getOwner());
+        fundMe.cheaperWithdraw(); //7 should have spent gas?
 
         uint256 gasEnd = gasleft(); //3 800
         uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice; //3 200

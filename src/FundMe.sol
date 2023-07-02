@@ -21,9 +21,9 @@ contract FundMe {
         _;
     }
 
-    constructor(address priceFeed) {
+    constructor(address _priceFeed) {
         i_owner = msg.sender;
-        s_priceFeed = AggregatorV3Interface(priceFeed);
+        s_priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
     function fund() public payable {
@@ -42,6 +42,18 @@ contract FundMe {
         require(callSuccess, "Call failed");
     }
 
+    function cheaperWithdraw() public onlyOwner {
+        uint256 fundersLenght = s_funders.length;
+        address[] memory funders = s_funders;
+        for (uint256 funderIndex = 0; funderIndex < fundersLenght; funderIndex++) {
+            address funder = funders[funderIndex];
+            s_addressToAmountFunded[funder] = 0;
+        }
+        s_funders = new address[](0);
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
+    }
+
     fallback() external payable {
         fund();
     }
@@ -52,11 +64,11 @@ contract FundMe {
 
     /**
      * @notice Gets the amount that an address has funded
-     *  @param fundingAddress the address of the funder
+     *  @param _fundingAddress the address of the funder
      *  @return the amount funded
      */
-    function getAddressToAmountFunded(address fundingAddress) public view returns (uint256) {
-        return s_addressToAmountFunded[fundingAddress];
+    function getAddressToAmountFunded(address _fundingAddress) public view returns (uint256) {
+        return s_addressToAmountFunded[_fundingAddress];
     }
 
     function getVersion() public view returns (uint256) {
