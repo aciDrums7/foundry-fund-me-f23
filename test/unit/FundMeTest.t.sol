@@ -3,8 +3,8 @@
 pragma solidity ^0.8.19;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe} from "../src/FundMe.sol";
-import {DeployFundMe} from "../script/DeployFundMe.s.sol";
+import {FundMe} from "../../src/FundMe.sol";
+import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
@@ -24,8 +24,8 @@ contract FundMeTest is Test {
         //2 us == msg.sender
         //3 fundMeTest == address(this) == fundMe.i_owner()
         // FundMe fundMe = new FundMe();
-        DeployFundMe deployFundMe = new DeployFundMe();
-        fundMe = deployFundMe.run();
+        DeployFundMe deployer = new DeployFundMe();
+        fundMe = deployer.run();
         vm.deal(USER, STARTING_BALANCE);
     }
 
@@ -163,5 +163,5 @@ contract FundMeTest is Test {
     }
 }
 
-//3 Modular deployments
-//5 Modular testing
+//2 Modular deployments
+//4 Modular testing
